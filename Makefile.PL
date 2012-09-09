@@ -1,6 +1,6 @@
 use inc::Module::Install;
 
-name 'Test::UselessModule';
+name 'Test-UselessModule';
 all_from 'lib/Test/UselessModule.pm';
 
 requires 'Test::More';
