@@ -27,6 +27,16 @@ my @THE_SERVICE_MODULE = qw/
     TheService::Core;
 /;
 
+my @TEST_MODULE = qw/
+    Test::More
+    Test::Exception
+/;
+
+my @TOKENS = qw/
+    __END__
+    __DATA__
+/;
+
 # - mixed (Upper|Lower)Case-method
 #   ( for example Date::Calc::Add_Delta_DHMS )
 # - loading other NameSpace
@@ -41,7 +51,7 @@ sub namespace2path{
     my $target = shift;
 
     return 'lib/' unless defined $target;
-    return $target if $target =~ qr{^lib/};
+    return $target if $target =~ qr{\A(lib|script|t)/};
 
     return sprintf('lib/%s',
         join '/',split /::/,$target
@@ -49,7 +59,7 @@ sub namespace2path{
 }
 
 sub check_file {
-    my ($check) = @_;
+    my ($check , $is_test) = @_;
 
     open(my $read_file, '<', $check);
     my $file = do {
@@ -63,9 +73,12 @@ sub check_file {
     for my $line ( <$read_file> ){
         chomp $line;
         
+        last if _is_token($line);
+        
         next if _is_cpan_core_module($line);
         next if _is_inheritance_module($line);
         next if _is_the_service_module($line);
+        next if $is_test && _is_test_module($line);
         
         my @values = ( $line =~ m/\Ause ([\w\:]+)([^;]*)?;\z/g );
         next if ! @values;
@@ -118,6 +131,16 @@ sub _is_inheritance_module{
 sub _is_the_service_module{
     my $line = shift;
     return 1 if _is_hit_module( $line , \@THE_SERVICE_MODULE );
+}
+
+sub _is_test_module{
+    my $line = shift;
+    return 1 if _is_hit_module( $line , \@TEST_MODULE );
+}
+
+sub _is_token {
+    my $line = shift;
+    return List::MoreUtils::any { $_ eq $line } @TOKENS;
 }
 
 sub _is_hit_module{

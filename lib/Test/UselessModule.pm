@@ -65,6 +65,7 @@ Test::UselessModule finds module which is written use , but does not be used.
 =head1 AUTHOR
 
 masartz E<lt>masartz@gmail.comE<gt>
+HARUYAMA Seigo E<lt>haruyama@unixuser.orgE<gt>
 
 =head1 SEE ALSO
 
