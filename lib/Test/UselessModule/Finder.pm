@@ -28,8 +28,11 @@ my @THE_SERVICE_MODULE = qw/
 /;
 
 my @TEST_MODULE = qw/
-    Test::More
+    Test::Base
+    Test::Deep
     Test::Exception
+    Test::Exit
+    Test::More
 /;
 
 my @TOKENS = qw/
@@ -104,6 +107,8 @@ sub _check_using_module{
             _is_class_method( $file , $module->{package} ) 
         ||
             _is_subroutine( $file , $module->{package} )
+        ||
+            _is_new( $file , $module->{package} )
         ){
             unless( scalar @{$module->{func}} ){
                 push @error , $module->{package};
@@ -180,6 +185,12 @@ sub _is_subroutine{
         }
     }
     return 0;
+}
+
+sub _is_new{
+    my ( $file , $module ) = @_;
+
+    $file =~ qr/new\s+$module(?!:)/;
 }
 
 sub _is_exist_import_sub{

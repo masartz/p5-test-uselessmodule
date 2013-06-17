@@ -21,6 +21,7 @@ subtest '_is_hit_module' => sub{
         TheService::Nothing
         TheService::Subroutine
         TheService::Export
+        TheService::New::New
     /;
     for my $class ( @classes ){
         ok Test::UselessModule::Finder::_is_hit_module($class , \@classes);
@@ -35,6 +36,8 @@ subtest '_is_class_method' => sub{
         TheService::Parent
         TheService::Export
         TheService::Constant
+        TheService::New
+        TheService::New::New
     /){
         ok ! Test::UselessModule::Finder::_is_class_method(
             $DATA , $ng_class
@@ -59,11 +62,33 @@ subtest '_is_subroutine' => sub{
         TheService::MethodSpace
         TheService::MethodLF
         TheService::Parent
+        TheService::New
+        TheService::New::New
     /){
         ok ! Test::UselessModule::Finder::_is_subroutine($DATA , $class) , $class;
     }
     ok Test::UselessModule::Finder::_is_subroutine($DATA , 'TheService::Subroutine');
     ok Test::UselessModule::Finder::_is_subroutine($DATA , 'TheService::Constant');
+};
+
+subtest '_is_new' => sub{
+    for my $ng_class (qw/
+        TheService::Nothing
+        TheService::Export
+        TheService::Method
+        TheService::MethodSpace
+        TheService::MethodLF
+        TheService::Parent
+        TheService::New
+    /){
+        ok ! Test::UselessModule::Finder::_is_new($DATA , $ng_class) , $ng_class;
+    }
+
+    for my $ok_class (qw/
+        TheService::New::New
+    /){
+        ok Test::UselessModule::Finder::_is_new($DATA , $ok_class) , $ok_class;
+    }
 };
 
 subtest '_is_exist_import_sub' => sub{
@@ -96,6 +121,8 @@ use TheService::Method;
 use TheService::MethodSpace;
 use TheService::MethodLF;
 use TheService::Export qw/ export_func /;
+use TheService::New;
+use TheService::New::New;
 
 sub new{
     my ( $class , %args ) = @_;
@@ -116,6 +143,8 @@ sub display{
     my $ret3 = TheService::Constant::CONSTANT_CASE;
 
     my $ret4 = export_func();
+
+    my $ret5 = new TheService::New::New;
 
     return;
 }
