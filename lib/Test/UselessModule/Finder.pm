@@ -56,6 +56,8 @@ sub namespace2path{
     return 'lib/' unless defined $target;
     return $target if $target =~ qr{\A(lib|script|t)/};
 
+    return $target if $target =~ qr{\.pl\z};
+
     return sprintf('lib/%s',
         join '/',split /::/,$target
     );
