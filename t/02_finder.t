@@ -91,6 +91,36 @@ subtest '_is_new' => sub{
     }
 };
 
+subtest '_is_method_which_takes_module_name_in_the_first_parameter' => sub{
+    for my $ng_class (qw/
+        TheService::Nothing
+        TheService::Subroutine
+        TheService::Parent
+        TheService::Export
+        TheService::Constant
+        TheService::Method
+        TheService::MethodSpace
+        TheService::MethodLF
+        TheService::New
+        TheService::New::New
+        TheService::Faked
+        TheService::Can
+    /){
+        ok ! Test::UselessModule::Finder::_is_method_which_takes_module_name_in_the_first_parameter(
+            $DATA , $ng_class
+        ), $ng_class;
+    }
+    for my $ok_class (qw/
+        TheService::Can::Ok
+        TheService::Faked::Module
+    /){
+        ok Test::UselessModule::Finder::_is_method_which_takes_module_name_in_the_first_parameter(
+            $DATA , $ok_class
+        ) ,$ok_class;
+    }
+};
+
+
 subtest '_is_exist_import_sub' => sub{
     ok ! Test::UselessModule::Finder::_is_exist_import_sub(
         $DATA , []
@@ -123,6 +153,13 @@ use TheService::MethodLF;
 use TheService::Export qw/ export_func /;
 use TheService::New;
 use TheService::New::New;
+use TheService::Faked::Module;
+use TheService::Faked;
+use TheService::Can;
+use TheService::Can::Ok;
+
+use Test::More;
+use Test::MockObject;
 
 sub new{
     my ( $class , %args ) = @_;
@@ -145,6 +182,9 @@ sub display{
     my $ret4 = export_func();
 
     my $ret5 = new TheService::New::New;
+
+    my $mock1 = Test::MockObject->fake_module('TheService::Faked::Module', test => sub {1});
+    can_ok("TheService::Can::Ok");
 
     return;
 }

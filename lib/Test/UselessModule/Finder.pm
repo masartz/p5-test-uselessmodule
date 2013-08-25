@@ -4,16 +4,28 @@ use warnings;
 
 use List::MoreUtils;
 
+# '5' exists for 'use 5.008;' (for example)
 my @CPAN_MODULE = qw/
+    5
+
     strict
     warnings
-    constant
     utf8
-    vars
+
+    charnames
+    constant
+    feature
     overload
+    vars
+
     Mouse
-    UNIVERSAL
     Readonly
+    UNIVERSAL
+
+    Devel::Cycle
+    HTTP::Request::Common
+    Plack::Builder
+    URI::Escape
     URI::QueryParam
 /;
 
@@ -28,11 +40,22 @@ my @THE_SERVICE_MODULE = qw/
 /;
 
 my @TEST_MODULE = qw/
+    Plack::Test
+
+    Test::Apache2
+    Test::Apache2::RequestRec
     Test::Base
     Test::Deep
     Test::Exception
     Test::Exit
+    Test::Flatten
+    Test::MockTime::DateCalc
     Test::More
+    Test::Pod
+    Test::Random
+    Test::Synchronized
+    Test::Warn
+    Test::XML
 /;
 
 my @TOKENS = qw/
@@ -111,6 +134,8 @@ sub _check_using_module{
             _is_subroutine( $file , $module->{package} )
         ||
             _is_new( $file , $module->{package} )
+        ||
+            _is_method_which_takes_module_name_in_the_first_parameter( $file , $module->{package} )
         ){
             unless( scalar @{$module->{func}} ){
                 push @error , $module->{package};
@@ -202,6 +227,11 @@ sub _is_exist_import_sub{
         return 1 if $file =~ qr/$func/;
     }
     return 0;
+}
+
+sub _is_method_which_takes_module_name_in_the_first_parameter {
+    my ( $file , $module) = @_;
+    $file =~ qr/(?:can_ok|->fake_module)\s*\(\s*(['"])$module\1/m;
 }
 
 1;
