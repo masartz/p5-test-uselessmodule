@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use List::MoreUtils;
+use Test::UselessModule::ExceptTarget;
 
 # '5' exists for 'use 5.008;' (for example)
 my @CPAN_MODULE = qw/
@@ -34,10 +35,7 @@ my @INHERITANCE_MODULE = qw/
     parent
 /;
 
-my @THE_SERVICE_MODULE = qw/
-    TheService;
-    TheService::Core;
-/;
+my @THE_SERVICE_MODULE = qw//;
 
 my @TEST_MODULE = qw/
     Plack::Test
@@ -88,6 +86,8 @@ sub namespace2path{
 
 sub check_file {
     my ($check , $is_test) = @_;
+
+    @THE_SERVICE_MODULE = Test::UselessModule::ExceptTarget::get();
 
     open(my $read_file, '<', $check);
     my $file = do {

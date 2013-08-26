@@ -6,11 +6,16 @@ our $VERSION = '0.01';
 
 use Exporter qw(import);
 use Cwd;
+use Data::Util;
 use File::Find;
 use Test::More;
 use Test::UselessModule::Finder;
+use Test::UselessModule::ExceptTarget;
 
-our @EXPORT = qw/ lean_module_use_ok /;
+our @EXPORT = qw/
+    lean_module_use_ok
+    add_exception_module
+/;
 
 sub lean_module_use_ok {
     my ( $namespace ) = @_;
@@ -40,6 +45,14 @@ sub lean_module_use_ok {
     }, $dir);
 }
 
+sub add_exception_module{
+    my $exception_module = shift;
+
+    Data::Util::is_array_ref( $exception_module ) or die;
+
+    return Test::UselessModule::ExceptTarget::add($exception_module);
+}
+
 1;
 
 __END__
@@ -53,14 +66,28 @@ Test::UselessModule - finding useless module
 use Test::More;
 use Test::UselessModule;
 
+add_exception_module( [qw/
+    TheService::Module::Except1
+    TheService::Module::Except2
+/]);
+
 lean_module_use_ok(); # finding under lib directories.
-lean_module_use_ok(Hoge::Moge); # finding under lib/Hoge/Moge directories.
+
+lean_module_use_ok('TheService::Module'); # finding under lib/TheService/Module directories.
 
 done_testing();
 
 =head1 DESCRIPTION
 
 Test::UselessModule finds module which is written use , but does not be used.
+=head1 METHODS
+
+=head2 lean_module_use_ok
+
+=head2 add_exception_module
+
+you can add modules which is except from lean_module_use_ok's check.
+you have to give one ARRAY_REF as parameter.
 
 =head1 AUTHOR
 
