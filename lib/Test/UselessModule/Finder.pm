@@ -178,6 +178,8 @@ sub _is_token {
 sub _is_hit_module{
     my ( $line , $module ) = @_;
 
+    return 0 unless scalar @{$module};
+
     my $regexp = join '|' , @{$module};
     return 1 if $line =~ /($regexp)/ ;
 }
