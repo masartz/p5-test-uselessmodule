@@ -4,10 +4,10 @@ use warnings;
 
 use Data::Util;
 
-my @EXCEPT_TARGET_MODULE = ();
+my @except_target_module = ();
 
 sub get{
-    return @EXCEPT_TARGET_MODULE;
+    return @except_target_module;
 }
 
 sub add{
@@ -15,13 +15,13 @@ sub add{
     
     Data::Util::is_array_ref( $add_list ) or die;
     
-    push @EXCEPT_TARGET_MODULE , @{$add_list};
+    push @except_target_module , @{$add_list};
 
-    return @EXCEPT_TARGET_MODULE;
+    return @except_target_module;
 }
 
 sub clear{
-    @EXCEPT_TARGET_MODULE = ();
+    @except_target_module = ();
 }
 
 1;
