@@ -128,9 +128,33 @@ subtest '_is_exist_import_sub' => sub{
     ok ! Test::UselessModule::Finder::_is_exist_import_sub(
         $DATA , [qw/unexport/]
     );
-    ok Test::UselessModule::Finder::_is_exist_import_sub(
+    ok ! Test::UselessModule::Finder::_is_exist_import_sub(
         $DATA , [qw/unexport export_func/]
     );
+    ok Test::UselessModule::Finder::_is_exist_import_sub(
+        $DATA , [qw/unexport export_func export_and_use_func/]
+    );
+};
+
+subtest '_is_pragma_module' => sub{
+    for my $ok_class (
+        'use 5.0008;',
+        'use 5.0014;',
+        'use strict;',
+        'use warnings;',
+        q{use constant HOGE => 'moge';},
+        'use overload'
+    ){
+        ok Test::UselessModule::Finder::_is_pragma_module( $ok_class ), $ok_class;
+    }
+    for my $ng_class (
+        'use TheService::Encodings qw/euc2utf8/;',
+        'use TheService::Warnings;',
+        q{use TheService::constant HOGE => 'moge';},
+        'use TheService::overload'
+    ){
+        ok ! Test::UselessModule::Finder::_is_pragma_module( $ng_class ), $ng_class;
+    }
 };
 
 done_testing;
@@ -150,7 +174,7 @@ use TheService::Parent::Child;
 use TheService::Method;
 use TheService::MethodSpace;
 use TheService::MethodLF;
-use TheService::Export qw/ export_func /;
+use TheService::Export qw/ export_func export_and_use_func /;
 use TheService::New;
 use TheService::New::New;
 use TheService::Faked::Module;
@@ -179,7 +203,7 @@ sub display{
 
     my $ret3 = TheService::Constant::CONSTANT_CASE;
 
-    my $ret4 = export_func();
+    my $ret4 = export_and_use_func();
 
     my $ret5 = new TheService::New::New;
 

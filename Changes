@@ -2,5 +2,9 @@ Revision history for Perl extension Test::UselessModule
 
 {{$NEXT}}
 
+0.02    Tue Dec 20 17:48:48 2013
+        - [FIXED] import function check has not worked anytime
+        - [FIXED] missjudge function (looks like pragma)
+
 0.01    Tue Sep  4 08:59:48 2012
         - original version

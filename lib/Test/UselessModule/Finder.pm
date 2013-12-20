@@ -6,7 +6,7 @@ use List::MoreUtils;
 use Test::UselessModule::ExceptTarget;
 
 # '5' exists for 'use 5.008;' (for example)
-my @CPAN_MODULE = qw/
+my @PRAGMA_MODULE = qw/
     5
 
     strict
@@ -18,7 +18,9 @@ my @CPAN_MODULE = qw/
     feature
     overload
     vars
+/;
 
+my @CPAN_MODULE = qw/
     Mouse
     Readonly
     UNIVERSAL
@@ -103,6 +105,7 @@ sub check_file {
         
         last if _is_token($line);
         
+        next if _is_pragma_module($line);
         next if _is_cpan_core_module($line);
         next if _is_inheritance_module($line);
         next if _is_the_service_module($line);
@@ -148,6 +151,16 @@ sub _check_using_module{
         }
     }
     return @error;
+}
+
+sub _is_pragma_module{
+    my $line = shift;
+    
+    my @use_pragma = map{
+        sprintf 'use %s' , $_
+    } @PRAGMA_MODULE;
+
+    return 1 if _is_hit_module( $line , \@use_pragma );
 }
 
 sub _is_cpan_core_module{
@@ -226,7 +239,8 @@ sub _is_exist_import_sub{
     my ( $file , $func_aryref ) = @_;
 
     for my $func ( @{$func_aryref} ){
-        return 1 if $file =~ qr/$func/;
+        my @match_hit = $file =~ /$func/g;
+        return 1 if scalar @match_hit >= 2;
     }
     return 0;
 }
