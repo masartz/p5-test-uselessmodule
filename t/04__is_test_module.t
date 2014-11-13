@@ -5,28 +5,28 @@ use Test::More;
 use Test::UselessModule::Finder;
 
 subtest '_is_test_module' => sub{
-    my @classes = qw/
-        Plack::Test
+    my @classes = (
+        'use Plack::Test;',
 
-        Test::Apache2
-        Test::Apache2::RequestRec
-        Test::Base
-        Test::Deep
-        Test::Exception
-        Test::Exit
-        Test::Flatten
-        Test::MockTime::DateCalc
-        Test::More
-        Test::Pod
-        Test::Random
-        Test::Synchronized
-        Test::Warn
-        Test::XML
-    /;
+        'use Test::Apache2;',
+        'use Test::Apache2::RequestRec;',
+        'use Test::Base;',
+        'use Test::Deep;',
+        'use Test::Exception;',
+        'use Test::Exit;',
+        'use Test::Flatten;',
+        'use Test::MockTime::DateCalc;',
+        'use Test::More;',
+        'use Test::Pod;',
+        'use Test::Random;',
+        'use Test::Synchronized;',
+        'use Test::Warn;',
+        'use Test::XML;'
+    );
     for my $class ( @classes ){
         ok Test::UselessModule::Finder::_is_test_module($class);
     }
-    ok ! Test::UselessModule::Finder::_is_test_module('TheService::Other');
+    ok ! Test::UselessModule::Finder::_is_test_module('use TheService::Other;');
 };
 
 done_testing;

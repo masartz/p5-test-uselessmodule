@@ -11,9 +11,23 @@ my $DATA;
 }
 
 subtest '_import_func2ary' => sub{
-    my $str = 'qw/foo bar baz/';
-    my @ary = Test::UselessModule::Finder::_import_func2ary( $str );
-    is_deeply \@ary , [qw/foo bar baz/];
+    subtest 'import by qw//' => sub {
+        my $str = 'qw/foo bar baz/';
+        my @ary = Test::UselessModule::Finder::_import_func2ary( $str );
+        is_deeply( \@ary, [qw/foo bar baz/] );
+    };
+
+    subtest 'import by single quote ' => sub {
+        my $str = "'foo_bar_123'";
+        my @ary = Test::UselessModule::Finder::_import_func2ary( $str );
+        is_deeply( \@ary, ['foo_bar_123'] );
+    };
+
+    subtest 'import by ()' => sub {
+        my $str = "('fuga', 'piyo')";
+        my @ary = Test::UselessModule::Finder::_import_func2ary( $str );
+        is_deeply( \@ary, [qw/fuga piyo/] );
+    };
 };
 
 subtest '_is_hit_module' => sub{
@@ -155,6 +169,38 @@ subtest '_is_pragma_module' => sub{
     ){
         ok ! Test::UselessModule::Finder::_is_pragma_module( $ng_class ), $ng_class;
     }
+};
+
+subtest '_is_cpan_core_module' => sub {
+    subtest 'is CPAN module' => sub {
+        my @cpan_modules = (
+            'use Mouse;',
+            'use Readonly;',
+            'use UNIVERSAL;',
+            'use Data::Dumper;',
+            'use Devel::Cycle;',
+            'use Exporter qw/ import /;',
+            'use HTTP::Request::Common;',
+            'use Plack::Builder;',
+            'use URI::Escape;',
+            'use URI::QueryParam',
+        );
+        foreach my $module ( @cpan_modules ) {
+            my $result = Test::UselessModule::Finder::_is_cpan_core_module( $module );
+            is( $result, 1 );
+        }
+    };
+
+    subtest 'is not CPAN module' => sub {
+        my @not_cpan_modules = (
+            'use Data::Sofu;',
+            'use Encomp::Exporter::Spec',
+        );
+        foreach my $module ( @not_cpan_modules ) {
+            my $result = Test::UselessModule::Finder::_is_cpan_core_module( $module );
+            is( $result, 0 );
+        }
+    };
 };
 
 done_testing;

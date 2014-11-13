@@ -25,7 +25,9 @@ my @CPAN_MODULE = qw/
     Readonly
     UNIVERSAL
 
+    Data::Dumper
     Devel::Cycle
+    Exporter
     HTTP::Request::Common
     Plack::Builder
     URI::Escape
@@ -155,37 +157,42 @@ sub _check_using_module{
 
 sub _is_pragma_module{
     my $line = shift;
-    
-    my @use_pragma = map{
-        sprintf 'use %s' , $_
-    } @PRAGMA_MODULE;
-
-    return 1 if _is_hit_module( $line , \@use_pragma );
+    return 1 if _is_hit_module_declaration( $line , \@PRAGMA_MODULE );
 }
 
 sub _is_cpan_core_module{
     my $line = shift;
-    return 1 if _is_hit_module( $line , \@CPAN_MODULE );
+    return 1 if _is_hit_module_declaration( $line , \@CPAN_MODULE );
 }
 
 sub _is_inheritance_module{
     my $line = shift;
-    return 1 if _is_hit_module( $line , \@INHERITANCE_MODULE );
+    return 1 if _is_hit_module_declaration( $line , \@INHERITANCE_MODULE );
 }
 
 sub _is_the_service_module{
     my $line = shift;
-    return 1 if _is_hit_module( $line , \@THE_SERVICE_MODULE );
+    return 1 if _is_hit_module_declaration( $line , \@THE_SERVICE_MODULE );
 }
 
 sub _is_test_module{
     my $line = shift;
-    return 1 if _is_hit_module( $line , \@TEST_MODULE );
+    return 1 if _is_hit_module_declaration( $line , \@TEST_MODULE );
 }
 
 sub _is_token {
     my $line = shift;
     return List::MoreUtils::any { $_ eq $line } @TOKENS;
+}
+
+sub _is_hit_module_declaration {
+    my ( $line, $module ) = @_;
+    return 0 unless scalar @{$module};
+
+    my $regexp = join '|' , @{$module};
+
+    return 1 if $line =~ /\Ause(\s)+($regexp)(.)*\z/ ;
+    return 0;
 }
 
 sub _is_hit_module{
@@ -200,8 +207,9 @@ sub _is_hit_module{
 sub _import_func2ary{
     my $import_func = shift;
 
-    my @ary = ( $import_func =~ m/[\w]+/g );
-    shift @ary;
+    my @ary = ( $import_func =~ m/[a-zA-Z0-9_]+/g );
+    # sweep [qw] from @ary  when it is used by import
+    shift @ary if ( defined($ary[0]) && $ary[0] eq 'qw' );
 
     return @ary;
 }
