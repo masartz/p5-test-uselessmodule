@@ -2,6 +2,9 @@ Revision history for Perl extension Test::UselessModule
 
 {{$NEXT}}
 
+0.03    Tue Nov 14 00:00:00 2014
+        - [FIXED] validate module's declaration (thanks for Jun Hashimoto)
+
 0.02    Tue Dec 20 17:48:48 2013
         - [FIXED] import function check has not worked anytime
         - [FIXED] missjudge function (looks like pragma)
